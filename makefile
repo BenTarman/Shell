@@ -26,7 +26,7 @@ CC = g++
 OBJS = *.cpp
 HEADERS = *.h
 NAME = MyShell
-COMMON_FLAGS = -Wall -l readline
+COMMON_FLAGS = -Wall -l readline 
 
 ifeq ($(shell uname),Darwin)
 	CPP_FLAGS = $(COMMON_FLAGS) -I/usr/local/opt/readline/include

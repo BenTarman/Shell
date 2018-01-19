@@ -6,26 +6,38 @@
 #include "shell.h"
 #include <iostream>
 
+#define PATH_MAX	1024
 using namespace std;
 
-
 int Shell::com_ls(vector<string>& argv) {
-  // TODO: YOUR CODE GOES HERE
+
+
   cout << "ls called" << endl; // delete when implemented
   return 0;
 }
 
 
 int Shell::com_cd(vector<string>& argv) {
-  // TODO: YOUR CODE GOES HERE
-  cout << "cd called" << endl; // delete when implemented
-  return 0;
+ 
+  chdir(argv[1].c_str()); 
+  
+return 0;  
+
 }
 
 
 int Shell::com_pwd(vector<string>& argv) {
-  // TODO: YOUR CODE GOES HERE
-  cout << "pwd called" << endl; // delete when implemented
+  char currDir[PATH_MAX];
+  if (getcwd (currDir, PATH_MAX) != 0)
+  	printf ("%s\n", currDir);
+  else 
+    {
+      printf ("Error getting pwd: %s\n", currDir);
+      return 1;
+    }
+
+
+
   return 0;
 }
 
