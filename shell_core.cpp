@@ -63,6 +63,7 @@ int Shell::loop_and_handle_input() {
     // If the command is non-empty, attempt to execute it.
     if (line[0]) {
       return_value = execute_line(line);
+			add_history(line); //let GNU handle history.
     }
 
     // Free the memory for the input string.

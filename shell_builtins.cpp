@@ -67,9 +67,11 @@ int Shell::com_unalias(vector<string>& argv) {
 
 
 int Shell::com_echo(vector<string>& argv) {
-  // TODO: YOUR CODE GOES HERE
-  cout << "echo called" << endl; // delete when implemented
-  return 0;
+  for (auto itr = argv.begin() + 1; itr != argv.end(); itr++)
+		std::cout << *itr << " ";
+	printf("\n\r");
+
+	return 0;
 }
 
 
