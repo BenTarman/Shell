@@ -18,7 +18,7 @@ int Shell::com_ls(vector<string>& argv) {
 	}
 
 	char buffer[BUFF_SIZE];
-	while (fgets(buffer, BUFF_SIZE, f))
+	while (fgets(buffer, BUFF_SIZE, file))
 		fprintf(stdout, "%s", buffer);
 
 	pclose(file)
