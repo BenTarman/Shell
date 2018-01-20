@@ -23,7 +23,8 @@ Shell Shell::instance;
 Shell::Shell() {
   // Tell readline that we want its help managing history.
   using_history();
-
+	//store history in tmp directory
+	read_history(("/home/bentarman/cplusplus/project-1-BenTarman/history"));
   // Tell readline that we want to try tab-completion first.
   rl_attempted_completion_function = word_completion;
 
@@ -64,6 +65,7 @@ int Shell::loop_and_handle_input() {
     if (line[0]) {
       return_value = execute_line(line);
 			add_history(line); //let GNU handle history.
+			write_history("/home/bentarman/cplusplus/project-1-BenTarman/history");	
     }
 
     // Free the memory for the input string.

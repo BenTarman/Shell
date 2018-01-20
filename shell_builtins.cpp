@@ -76,9 +76,30 @@ int Shell::com_echo(vector<string>& argv) {
 
 
 int Shell::com_history(vector<string>& argv) {
-  // TODO: YOUR CODE GOES HERE
-  cout << "history called" << endl; // delete when implemented
-  return 0;
+  FILE *historyFile;
+	char c;
+
+	historyFile = fopen("/home/bentarman/cplusplus/project-1-BenTarman/history", "r");
+
+	unsigned int counter = 0;
+	while(1)
+	{
+		c = fgetc(historyFile);
+
+		if(c==EOF) break;
+		else
+		{
+		  printf("%c", c);
+		if (c == '\n')	
+		  printf("%i ", counter++);
+		}
+	}
+
+	fclose(historyFile);
+
+
+
+	return 0;
 }
 
 
