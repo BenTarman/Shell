@@ -30,7 +30,7 @@ COMMON_FLAGS = -Wall -l readline
 
 ifeq ($(shell uname),Darwin)
 	CPP_FLAGS = $(COMMON_FLAGS) -I/usr/local/opt/readline/include
-	LDFLAGS = -L/usr/local/opt/readline/lib
+	LDFLAGS = -L/usr/lib/opt/readline/lib
 else
 	CPP_FLAGS = $(COMMON_FLAGS)
 	LDFLAGS =

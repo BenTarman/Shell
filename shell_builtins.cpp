@@ -6,13 +6,23 @@
 #include "shell.h"
 #include <iostream>
 
-#define PATH_MAX	1024
+#define BUFF_SIZE 1024
 using namespace std;
 
 int Shell::com_ls(vector<string>& argv) {
+  FILE* file = popen("ls", "r");
+  if (file == 0)
+	{
+		printf("error listing files");
+		return 1;
+	}
 
+	char buffer[BUFF_SIZE];
+	while (fgets(buffer, BUFF_SIZE, f))
+		fprintf(stdout, "%s", buffer);
 
-  cout << "ls called" << endl; // delete when implemented
+	pclose(file)
+
   return 0;
 }
 
@@ -27,8 +37,8 @@ return 0;
 
 
 int Shell::com_pwd(vector<string>& argv) {
-  char currDir[PATH_MAX];
-  if (getcwd (currDir, PATH_MAX) != 0)
+  char currDir[BUFF_SIZE];
+  if (getcwd (currDir, BUFF_SIZE) != 0)
   	printf ("%s\n", currDir);
   else 
     {
