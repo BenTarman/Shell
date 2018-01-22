@@ -157,7 +157,16 @@ void Shell::local_variable_assignment(vector<string>& tokens) {
 
 
 void Shell::alias_substitution(vector<string>& tokens) {
-  // TODO: implement alias handling
+
+  if (!aliases.empty())
+  {
+    for (auto itr = tokens.begin(); itr != tokens.end(); itr++)
+    {
+      if (aliases.find(*itr) != aliases.end()) //if element is key in map then do sub 
+	*itr = aliases[*itr]; 
+    }
+  } 
+
 }
 
 

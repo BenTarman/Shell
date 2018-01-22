@@ -53,8 +53,22 @@ int Shell::com_pwd(vector<string>& argv) {
 
 
 int Shell::com_alias(vector<string>& argv) {
-  // TODO: YOUR CODE GOES HERE
-  cout << "alias called" << endl; // delete when implemented
+ 
+  std::string key, value; 
+  size_t pos = 0;
+  std::string temp;
+
+  //loop till we find delimiter, and we get the key
+  while ((pos = argv[1].find("=")) != std::string::npos)
+  {
+  key = argv[1].substr(0, pos);
+  argv[1].erase(0, pos + 1);
+  }
+  //rest of the string is the value for the alias
+  value = argv[1];
+
+  //place in alias map
+  aliases.emplace(key, value);
   return 0;
 }
 
