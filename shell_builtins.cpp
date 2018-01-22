@@ -74,8 +74,27 @@ int Shell::com_alias(vector<string>& argv) {
 
 
 int Shell::com_unalias(vector<string>& argv) {
-  // TODO: YOUR CODE GOES HERE
-  cout << "unalias called" << endl; // delete when implemented
+
+  //give user info how to use command if used wrong (just like linux bash does).
+  if (argv.size() == 1)
+  {
+    std::cout << "unalias: usage: unalias [-a] name [name ...]" << std::endl;
+    return 1;
+  }
+
+
+  if (argv[1] == "-a")
+    aliases.clear(); //removes all aliases
+  else
+  {
+  //find if value is aliases
+  for (auto elem : aliases)
+  {
+    if (elem.second == argv[1])
+      aliases.erase(aliases.find(elem.first));
+  }
+  }
+
   return 0;
 }
 
