@@ -77,8 +77,10 @@ int Shell::loop_and_handle_input() {
 
 
 string Shell::get_prompt(int return_value) {
-  // TODO: YOUR CODE GOES HERE
-  return "prompt > "; // replace with your own code
+  char username[20];
+  getlogin_r(username, 20);	
+  strcat(username,"> ");
+	return username; // replace with your own code
 }
 
 
