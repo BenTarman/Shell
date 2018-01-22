@@ -79,7 +79,13 @@ int Shell::loop_and_handle_input() {
 string Shell::get_prompt(int return_value) {
   char username[20];
   getlogin_r(username, 20);	
-  strcat(username,"> ");
+
+	if (return_value == 0)
+		strcat(username, " :D ");
+	else
+		strcat(username, " D: ");
+
+  strcat(username," $ ");
 	return username; // replace with your own code
 }
 
