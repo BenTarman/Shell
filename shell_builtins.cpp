@@ -37,6 +37,13 @@ return 0;
 
 
 int Shell::com_pwd(vector<string>& argv) {
+
+  std::cout << argv.size() << std::endl;
+  if (argv.size() > 1)
+  {
+	fprintf(stderr, ": too many arguments\n");
+	return 1;
+  }
   char currDir[BUFF_SIZE];
   if (getcwd (currDir, BUFF_SIZE) != 0)
   	printf ("%s\n", currDir);
