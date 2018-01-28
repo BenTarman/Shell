@@ -37,8 +37,6 @@ return 0;
 
 
 int Shell::com_pwd(vector<string>& argv) {
-
-  std::cout << argv.size() << std::endl;
   if (argv.size() > 1)
   {
 	fprintf(stderr, ": too many arguments\n");
