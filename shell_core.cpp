@@ -24,7 +24,7 @@ Shell::Shell() {
   // Tell readline that we want its help managing history.
   using_history();
 	//store history in tmp directory
-	read_history(("/home/bentarman/cplusplus/project-1-BenTarman/history"));
+	read_history(("/home/history"));
   // Tell readline that we want to try tab-completion first.
   rl_attempted_completion_function = word_completion;
 

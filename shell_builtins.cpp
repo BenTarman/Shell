@@ -5,11 +5,27 @@
 
 #include "shell.h"
 #include <iostream>
+#include <dirent.h>
+#include <readline/history.h>
 
 #define BUFF_SIZE 1024
 using namespace std;
 
 int Shell::com_ls(vector<string>& argv) {
+    
+  if (argv.size() > 1)
+  {
+     argv[0] = "cd";
+     int ret = com_cd(argv);
+     
+     if (ret != 0) 
+     {
+        fprintf(stderr, "%s: command not found\n", argv[1].c_str());
+        return 1;
+     }
+  }
+
+
   FILE* file = popen("ls", "r");
   if (file == 0)
 	{
@@ -21,17 +37,31 @@ int Shell::com_ls(vector<string>& argv) {
 	while (fgets(buffer, BUFF_SIZE, file))
 		fprintf(stdout, "%s", buffer);
 
-	pclose(file);
+  if (argv.size() > 1)
+	chdir("..");
+  pclose(file);
 
   return 0;
+
 }
 
 
 int Shell::com_cd(vector<string>& argv) {
- 
-  chdir(argv[1].c_str()); 
+
+  int ret;
+  if (argv.size() == 1)
+	ret = chdir(getenv("HOME"));
+  else 
+  {
+    if (argv.size() > 2)
+    {
+      fprintf(stderr, "too many arguments\n");
+      return 1;
+    } 
+     ret = chdir(argv[1].c_str()); 
+  }
   
-return 0;  
+return ret;  
 
 }
 
@@ -58,7 +88,37 @@ int Shell::com_pwd(vector<string>& argv) {
 
 
 int Shell::com_alias(vector<string>& argv) {
- 
+
+  if (argv.size() > 2)
+  {
+    fprintf(stderr, "too many arguments\n");
+    return 1;
+  }
+
+ if (argv.size() == 1) {
+    for (auto const &elem : aliases)
+    {
+	printf("%s='%s'\n", elem.first.c_str(), elem.second.c_str());
+    }
+    return 0;
+  }
+
+
+  if (argv[1].find('=') == std::string::npos)
+  {
+  for (auto elem : aliases)
+  {
+    if (elem.second == argv[1])
+    {
+        printf("%s='%s'\n", elem.first.c_str(), elem.second.c_str());
+        return 0;
+    } 
+  }
+
+   fprintf(stderr, "alias is not assigned yet\n");
+   return 1;
+
+  } 
   std::string key, value; 
   size_t pos = 0;
   std::string temp;
@@ -80,6 +140,11 @@ int Shell::com_alias(vector<string>& argv) {
 
 int Shell::com_unalias(vector<string>& argv) {
 
+  if (argv.size() > 2)
+  {
+    fprintf(stderr, "too many arguments\n");
+    return 1;
+  }
   //give user info how to use command if used wrong (just like linux bash does).
   if (argv.size() == 1)
   {
@@ -107,35 +172,18 @@ int Shell::com_unalias(vector<string>& argv) {
 int Shell::com_echo(vector<string>& argv) {
   for (auto itr = argv.begin() + 1; itr != argv.end(); itr++)
 		std::cout << *itr << " ";
-	printf("\n\r");
+	printf("\n");
 
 	return 0;
 }
 
 
 int Shell::com_history(vector<string>& argv) {
-  FILE *historyFile;
-	char c;
-
-	historyFile = fopen("/home/bentarman/cplusplus/project-1-BenTarman/history", "r");
-
-	unsigned int counter = 0;
-	while(1)
-	{
-		c = fgetc(historyFile);
-
-		if(c==EOF) break;
-		else
-		{
-		  printf("%c", c);
-		if (c == '\n')	
-		  printf("%i ", counter++);
-		}
-	}
-
-	fclose(historyFile);
-
-
+	HISTORY_STATE* hist_state = history_get_history_state(); 
+	HIST_ENTRY** histlst = history_list();
+	printf("history\n");
+	for (int i = 1; *histlst; i++, histlst++) 
+            printf("%4d %s\n", i, (*histlst)->line);
 
 	return 0;
 }
