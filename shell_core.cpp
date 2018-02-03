@@ -93,7 +93,21 @@ int Shell::execute_line(char* line) {
   // TODO: expand the command from history using !!, !-N, etc
   // HINT: leverage readline! This should only be a couple lines of code.
 
+   char *interact_rdln_expn = NULL;
+   int expn_result = history_expand(line, &interact_rdln_expn);
+
+/*
+    if (expn_result) {
+        fprintf(stderr, "%s\n", interact_rdln_expn);
+    }
+    if (*interact_rdln_expn && *interact_rdln_expn != ' ')
+        add_history(interact_rdln_expn);
+    if (expn_result < 0 || expn_result == 2)
+	return NULL;
+*/
+
   // TODO: save the command to history (again, leverage readline!)
+  add_history(interact_rdln_expn);
 
   // Tokenize the input string.
   vector<string> tokens = tokenize_input(line);
