@@ -10,26 +10,37 @@
 #include "shell.h"
 #include <iostream>
 #include <sys/wait.h>
+#include <string.h>
+#include <algorithm>
 
 using namespace std;
+
+int lsh_launch(char**);
+char* convert(const std::string&);
+
 
 
 int Shell::execute_external_command(vector<string>& tokens) {
   // TODO: YOUR CODE GOES HERE
+  //convert to char** so coding with the system is easier...
+  std::vector<char*>  args; //this can be treated as char** if accessed as &args[0]
+  std::transform(tokens.begin(), tokens.end(), std::back_inserter(args), convert);    
+  lsh_launch(&args[0]);
 
-  std::vector<char *> argv(tokens.size() + 1);    // one extra for the null
 
-for (std::size_t i = 0; i != tokens.size(); ++i)
-{
-   std::cout << tokens[i];
-    argv[i] = &tokens[i][0];
-}
+  //clean memeory
+   for (size_t i = 0; i < args.size(); i++)
+     delete [] args[i];
 
-execvp(argv[0], argv.data());
   return 1;
 }
 
-
+char *convert(const std::string &s)
+{
+   char *pc = new char[s.size()+1];
+   strcpy(pc, s.c_str());
+   return pc; 
+}
 
 int lsh_launch(char **args)
 {
@@ -41,11 +52,13 @@ int lsh_launch(char **args)
     // Child process
     if (execvp(args[0], args) == -1) {
       perror("lsh");
+      return 1;
     }
     exit(EXIT_FAILURE);
   } else if (pid < 0) {
     // Error forking
     perror("lsh");
+    return 1;
   } else {
     // Parent process
     do {
@@ -53,6 +66,7 @@ int lsh_launch(char **args)
     } while (!WIFEXITED(status) && !WIFSIGNALED(status));
   }
 
-  return 1;
+ return 0;
+
 }
 
