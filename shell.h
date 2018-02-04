@@ -55,6 +55,12 @@ public:
    * @return The return value of the last command
    */
   int loop_and_handle_input();
+  
+/**
+   * A mapping of variables (local to the shell) and their corresponding values.
+   */
+  std::map<std::string, std::string> localvars;
+
 
 // Constructor (shell_core.cpp)
 private:
@@ -129,6 +135,9 @@ private:
    * @return The return code of the operation
    */
   int dispatch_command(std::vector<std::string>& argv);
+
+
+
 
 // BUILTINS (shell_builtins.cpp)
 private:
@@ -310,10 +319,7 @@ private:
    */
   std::map<std::string, builtin_t> builtins;
 
-  /**
-   * A mapping of variables (local to the shell) and their corresponding values.
-   */
-  std::map<std::string, std::string> localvars;
+
 
   /**
    * A mapping of aliases and their corresponding values.

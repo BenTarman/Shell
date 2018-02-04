@@ -19,6 +19,48 @@ using namespace std;
 // Initialize the singleton instance of the Shell class.
 Shell Shell::instance;
 
+static char *possibleVars[15];
+
+char* compl_cmd_generator(const char *text, int state)
+{
+
+    unsigned int counter = 0;
+
+    for (auto x : Shell::getInstance().localvars)
+	possibleVars[counter++] = (char*)("$" + x.first).c_str();
+
+
+    static int list_index, len;
+    char *name;
+
+    if (!state) {
+        list_index = 0;
+        len = strlen(text);
+    }
+
+    while ((name = possibleVars[list_index++])) {
+        if (strncmp(name, text, len) == 0) {
+            return strdup(name);
+        }
+    }
+
+    return NULL;
+}
+
+char** my_completion(const char *text, int start, int end)
+{
+    char **matches = NULL;
+    if (*text == '$')
+        matches = rl_completion_matches(text, compl_cmd_generator);
+
+    //else if (start == 0)
+     //   matches = rl_completion_matches(text, compl_cmd_generator);
+    return matches;
+}
+
+
+
+
 
 Shell::Shell() {
   // Tell readline that we want its help managing history.
@@ -26,7 +68,7 @@ Shell::Shell() {
 	//store history in tmp directory
 	read_history(("/home/history"));
   // Tell readline that we want to try tab-completion first.
-  rl_attempted_completion_function = word_completion;
+  rl_attempted_completion_function = my_completion;
 
   // Tell readline that $ should be left attached when performing completions.
   rl_special_prefixes = "$";
@@ -211,3 +253,5 @@ int Shell::dispatch_command(vector<string>& argv) {
 
   return return_value;
 }
+
+
