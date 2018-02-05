@@ -19,43 +19,27 @@ using namespace std;
 // Initialize the singleton instance of the Shell class.
 Shell Shell::instance;
 
-extern char**environ;
+extern char** environ;
 
-static unsigned int numEnvs = 0;
-
-void initializeEnvVariables()
-{
-
- //   unsigned int counter = 0;
-  //  int i = 1;
-
-}
 
 char* compl_cmd_generator(const char *text, int state)
 {
 
     std::vector<char*> envs;
-    char** p = environ;
- 
-    for (; *p != nullptr; ++p)
-    {
-	char* t = *p;
 
-	memmove(t + 1, t, strlen(t) + 1);
-	t[0] = '$';
-	
-	for (int j = 0; j < strlen(t); j++)
-	{
-	  if (t[j] == '=') { 
-		t[j] = NULL;
-		break;
-		}
-	}
+    char* p = *environ;
+    int i = 1; 
+    for (; p; i++)
+    {
+	char t[100];
+	snprintf(t, sizeof(t), "%s%s", "$", p);
 	envs.push_back(t);
+	p = *(environ + i);
     }
 
+
     for (auto x : Shell::getInstance().localvars)
-	envs.push_back((char*)("$" + x.first).c_str() );
+	envs.push_back((char*)("$" + x.first).c_str());
 
 
 
@@ -73,6 +57,7 @@ char* compl_cmd_generator(const char *text, int state)
         }
     }
 
+	envs.clear();
     return NULL; 
 }
 
@@ -112,7 +97,7 @@ Shell::Shell() {
   builtins["exit"] = &Shell::com_exit;
   builtins["history"] = &Shell::com_history;
 
-  initializeEnvVariables();
+
 }
 
 

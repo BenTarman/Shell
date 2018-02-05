@@ -60,6 +60,7 @@ public:
    * A mapping of variables (local to the shell) and their corresponding values.
    */
   std::map<std::string, std::string> localvars;
+  std::vector<char*> envs;
 
 
 // Constructor (shell_core.cpp)
