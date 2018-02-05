@@ -24,6 +24,39 @@ extern char** environ;
 
 char* compl_cmd_generator(const char *text, int state)
 {
+/*
+    std::vector<char*> cmds;
+
+    for (auto x : Shell::getInstance().builtins) {
+	cmds.push_back((char*)("$" + x.first).c_str());
+	}
+
+
+    static int list_index, len;
+    char *name;
+
+    if (!state) {
+        list_index = 0;
+        len = strlen(text);
+    }
+
+    while ((name = cmds[list_index++])) {
+        if (strncmp(name, text, len) == 0) {
+            return strdup(name);
+        }
+    }
+    return NULL; 
+
+*/
+
+
+}
+
+
+
+
+char* compl_env_generator(const char *text, int state)
+{
 
     std::vector<char*> envs;
 
@@ -31,16 +64,25 @@ char* compl_cmd_generator(const char *text, int state)
     int i = 1; 
     for (; p; i++)
     {
-	char t[100];
-	snprintf(t, sizeof(t), "%s%s", "$", p);
-	envs.push_back(t);
+	char* t = "$";
+	char* both = (char*)malloc(strlen(p) + strlen(t) + 2);
+	strcpy(both, t);
+	strcat(both, p);
+	//snprintf(t, sizeof(t), "%s%s", "$", p);
+	
+	for (int i = 0; i < strlen(both); i++)
+	{
+	   if (both[i] == '=') both[i] = '\0';
+	}
+	envs.push_back(both);
 	p = *(environ + i);
     }
 
 
-    for (auto x : Shell::getInstance().localvars)
-	envs.push_back((char*)("$" + x.first).c_str());
 
+    for (auto x : Shell::getInstance().localvars) {
+	envs.push_back((char*)("$" + x.first).c_str());
+}
 
 
     static int list_index, len;
@@ -56,8 +98,6 @@ char* compl_cmd_generator(const char *text, int state)
             return strdup(name);
         }
     }
-
-	envs.clear();
     return NULL; 
 }
 
@@ -65,7 +105,7 @@ char** my_completion(const char *text, int start, int end)
 {
     char **matches = NULL;
     if (*text == '$')
-    	matches = rl_completion_matches(text, compl_cmd_generator);
+    	matches = rl_completion_matches(text, compl_env_generator);
 
     else if (start == 0)
         matches = rl_completion_matches(text, compl_cmd_generator);

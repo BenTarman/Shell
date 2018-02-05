@@ -60,7 +60,9 @@ public:
    * A mapping of variables (local to the shell) and their corresponding values.
    */
   std::map<std::string, std::string> localvars;
-  std::vector<char*> envs;
+
+
+
 
 
 // Constructor (shell_core.cpp)
@@ -310,15 +312,17 @@ private:
   typedef int (Shell::*builtin_t)(std::vector<std::string>&);
 
   /**
+   * A mapping of internal commands to their corresponding functions.
+   */
+  std::map<std::string, builtin_t> builtins;
+
+  /**
    * The singleton instance of this class. Readline's callbacks must be regular
    * (non-instance) methods, so store an instance for easy access. Forgive me!
    */
   static Shell instance;
 
-  /**
-   * A mapping of internal commands to their corresponding functions.
-   */
-  std::map<std::string, builtin_t> builtins;
+
 
 
 
