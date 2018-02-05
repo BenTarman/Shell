@@ -19,15 +19,44 @@ using namespace std;
 // Initialize the singleton instance of the Shell class.
 Shell Shell::instance;
 
-static char *possibleVars[15];
+extern char**environ;
+
+static unsigned int numEnvs = 0;
+
+void initializeEnvVariables()
+{
+
+ //   unsigned int counter = 0;
+  //  int i = 1;
+
+}
 
 char* compl_cmd_generator(const char *text, int state)
 {
 
-    unsigned int counter = 0;
+    std::vector<char*> envs;
+    char** p = environ;
+ 
+    for (; *p != nullptr; ++p)
+    {
+	char* t = *p;
+
+	memmove(t + 1, t, strlen(t) + 1);
+	t[0] = '$';
+	
+	for (int j = 0; j < strlen(t); j++)
+	{
+	  if (t[j] == '=') { 
+		t[j] = NULL;
+		break;
+		}
+	}
+	envs.push_back(t);
+    }
 
     for (auto x : Shell::getInstance().localvars)
-	possibleVars[counter++] = (char*)("$" + x.first).c_str();
+	envs.push_back((char*)("$" + x.first).c_str() );
+
 
 
     static int list_index, len;
@@ -38,23 +67,23 @@ char* compl_cmd_generator(const char *text, int state)
         len = strlen(text);
     }
 
-    while ((name = possibleVars[list_index++])) {
+    while ((name = envs[list_index++])) {
         if (strncmp(name, text, len) == 0) {
             return strdup(name);
         }
     }
 
-    return NULL;
+    return NULL; 
 }
 
 char** my_completion(const char *text, int start, int end)
 {
     char **matches = NULL;
     if (*text == '$')
-        matches = rl_completion_matches(text, compl_cmd_generator);
+    	matches = rl_completion_matches(text, compl_cmd_generator);
 
-    //else if (start == 0)
-     //   matches = rl_completion_matches(text, compl_cmd_generator);
+    else if (start == 0)
+        matches = rl_completion_matches(text, compl_cmd_generator);
     return matches;
 }
 
@@ -82,6 +111,8 @@ Shell::Shell() {
   builtins["echo"] = &Shell::com_echo;
   builtins["exit"] = &Shell::com_exit;
   builtins["history"] = &Shell::com_history;
+
+  initializeEnvVariables();
 }
 
 
