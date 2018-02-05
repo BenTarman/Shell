@@ -12,6 +12,7 @@
 #include <readline/history.h>
 #include <readline/readline.h>
 #include <sstream>
+#include <dirent.h>
 
 using namespace std;
 
@@ -28,6 +29,30 @@ char* compl_cmd_generator(const char *text, int state)
     for (auto const &x : Shell::getInstance().builtins) {
 	cmds.push_back((char*)(x.first).c_str());
 	}
+	
+	DIR *dp;
+        struct dirent *dirp;
+        char *path = strdup(getenv("PATH"));
+        char *dir = strtok(path, ":");
+
+        while (dir) {
+            if ((dp = opendir(dir)) == NULL) {
+                /* silently fail during tab completion in case of error */
+                dir = strtok(NULL, ":");
+                continue;
+            }
+            while ((dirp = readdir(dp)) != NULL) {
+		cmds.push_back(dirp->d_name);
+                //compl_cmd_additem((hashtbl *)text, dirp->d_name, NULL);
+            }
+            closedir(dp);
+            dir = strtok(NULL, ":");
+        }
+
+	free(path);
+
+
+
 
     static int list_index, len;
     char *name;
@@ -73,6 +98,8 @@ char* compl_env_generator(const char *text, int state)
 	envs.push_back(both);
 	p = *(environ + i);
     }
+
+
 
 
 
