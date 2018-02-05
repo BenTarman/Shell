@@ -56,12 +56,20 @@ public:
    */
   int loop_and_handle_input();
   
+   //char** my_completion(const char *text, int start, int end);
 /**
    * A mapping of variables (local to the shell) and their corresponding values.
    */
   std::map<std::string, std::string> localvars;
 
 
+  // Define 'builtin_t' as a type for built-in functions.
+  typedef int (Shell::*builtin_t)(std::vector<std::string>&);
+
+  /**
+   * A mapping of internal commands to their corresponding functions.
+   */
+  std::map<std::string, builtin_t> builtins;
 
 
 
@@ -308,13 +316,7 @@ private:
 // CONSTANTS AND MEMBERS (shell_core.cpp)
 private:
 
-  // Define 'builtin_t' as a type for built-in functions.
-  typedef int (Shell::*builtin_t)(std::vector<std::string>&);
 
-  /**
-   * A mapping of internal commands to their corresponding functions.
-   */
-  std::map<std::string, builtin_t> builtins;
 
   /**
    * The singleton instance of this class. Readline's callbacks must be regular

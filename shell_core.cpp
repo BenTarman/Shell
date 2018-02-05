@@ -19,18 +19,15 @@ using namespace std;
 // Initialize the singleton instance of the Shell class.
 Shell Shell::instance;
 
-extern char** environ;
 
 
 char* compl_cmd_generator(const char *text, int state)
 {
-/*
     std::vector<char*> cmds;
 
-    for (auto x : Shell::getInstance().builtins) {
-	cmds.push_back((char*)("$" + x.first).c_str());
+    for (auto const &x : Shell::getInstance().builtins) {
+	cmds.push_back((char*)(x.first).c_str());
 	}
-
 
     static int list_index, len;
     char *name;
@@ -47,7 +44,6 @@ char* compl_cmd_generator(const char *text, int state)
     }
     return NULL; 
 
-*/
 
 
 }
@@ -80,7 +76,7 @@ char* compl_env_generator(const char *text, int state)
 
 
 
-    for (auto x : Shell::getInstance().localvars) {
+    for (auto const &x : Shell::getInstance().localvars) {
 	envs.push_back((char*)("$" + x.first).c_str());
 }
 
