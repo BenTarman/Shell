@@ -51,7 +51,6 @@ char* compl_cmd_generator(const char *text, int state)
             }
             while ((dirp = readdir(dp)) != NULL) {
 		cmds.push_back(dirp->d_name);
-                //compl_cmd_additem((hashtbl *)text, dirp->d_name, NULL);
             }
             closedir(dp);
             dir = strtok(NULL, ":");

@@ -1,4 +1,4 @@
-/**
+/*
  * This file contains the implementations of the builtin functions provided by
  * the shell (or will, once you've finished implementing them all).
  */
@@ -179,6 +179,8 @@ int Shell::com_echo(vector<string>& argv) {
 
 
 int Shell::com_history(vector<string>& argv) {
+
+	if (argv.size() > 1) return 1;
 	HISTORY_STATE* hist_state = history_get_history_state(); 
 	HIST_ENTRY** histlst = history_list();
 	printf("history\n");
