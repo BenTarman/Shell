@@ -26,6 +26,7 @@ int Shell::execute_external_command(vector<string>& tokens) {
   //convert to char** so coding with the system is easier...
   std::vector<char*>  args; //this can be treated as char** if accessed as &args[0]
   std::transform(tokens.begin(), tokens.end(), std::back_inserter(args), convert);   
+  args.push_back(NULL);
   std::string s;
   s = accumulate(begin(tokens), end(tokens), s);
   int ret = lsh_launch(&args[0], s.c_str());
@@ -45,7 +46,7 @@ char *convert(const std::string &s)
    return pc; 
 }
 
-int lsh_launch(char **args, const char* tok)
+int lsh_launch(char** args, const char* tok)
 {
 
   pid_t pid, wpid;
@@ -55,6 +56,7 @@ int lsh_launch(char **args, const char* tok)
   if (pid == 0) {
     // Child process
     if (execvp(args[0], args) != 0) {
+      printf("%s\n", args[0]);
       perror("lsh");
       return 1;
     }
@@ -69,6 +71,10 @@ int lsh_launch(char **args, const char* tok)
     do {
       wpid = waitpid(pid, &status, WUNTRACED);
     } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+   
+    if (status != 0)
+	return 1;	
+
   }
 
  return 0;

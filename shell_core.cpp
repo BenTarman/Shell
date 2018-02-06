@@ -13,6 +13,8 @@
 #include <readline/readline.h>
 #include <sstream>
 #include <dirent.h>
+#include <algorithm>
+#include <numeric>
 
 using namespace std;
 
@@ -21,15 +23,21 @@ using namespace std;
 Shell Shell::instance;
 
 
+char *myconvert(const std::string &s)
+{
+    char *pc = new char[s.size() + 1];
+    strcpy(pc, s.c_str());
+    return pc;
+}
+
 
 char* compl_cmd_generator(const char *text, int state)
 {
     std::vector<char*> cmds;
+    std::vector<std::string> temp;
+    std::vector<char*> builtincmds;
 
-    for (auto const &x : Shell::getInstance().builtins) {
-	cmds.push_back((char*)(x.first).c_str());
-	}
-	
+
 	DIR *dp;
         struct dirent *dirp;
         char *path = strdup(getenv("PATH"));
@@ -51,8 +59,15 @@ char* compl_cmd_generator(const char *text, int state)
 
 	free(path);
 
+    for (auto const &x : Shell::getInstance().builtins) {
+	temp.push_back(x.first);
+	}
+	
+ std::transform(temp.begin(), temp.end(), std::back_inserter(builtincmds), myconvert);
 
 
+
+cmds.insert( cmds.end(), builtincmds.begin(), builtincmds.end() );
 
     static int list_index, len;
     char *name;
@@ -68,10 +83,8 @@ char* compl_cmd_generator(const char *text, int state)
         }
     }
     return NULL; 
-
-
-
 }
+
 
 
 
@@ -80,6 +93,8 @@ char* compl_env_generator(const char *text, int state)
 {
 
     std::vector<char*> envs;
+    std::vector<std::string> temp;
+    std::vector<char*> localenvs;
 
     char* p = *environ;
     int i = 1; 
@@ -98,14 +113,16 @@ char* compl_env_generator(const char *text, int state)
 	envs.push_back(both);
 	p = *(environ + i);
     }
+    
+
+    for (auto x : Shell::getInstance().localvars)
+	temp.push_back((char*)("$" + x.first).c_str());
+
+ std::transform(temp.begin(), temp.end(), std::back_inserter(localenvs), myconvert);
 
 
 
-
-
-    for (auto const &x : Shell::getInstance().localvars) {
-	envs.push_back((char*)("$" + x.first).c_str());
-}
+envs.insert( envs.end(), localenvs.begin(), localenvs.end() );
 
 
     static int list_index, len;
@@ -223,10 +240,13 @@ int Shell::execute_line(char* line) {
 
   // Tokenize the input string.
   vector<string> tokens = tokenize_input(line);
-
+  
   // Handle local variable declarations.
   local_variable_assignment(tokens);
 
+  if(tokens.size() == 0){
+    return 0;
+  }
   // Handle the use of an alias.
   alias_substitution(tokens);
 
@@ -274,6 +294,7 @@ void Shell::local_variable_assignment(vector<string>& tokens) {
     string key = token->substr(0, eq_pos);
     string value = token->substr(eq_pos + 1);
     localvars[key] = value;
+
 
     // Erase the token and advance to the next one.
     token = tokens.erase(token);
