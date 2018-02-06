@@ -23,134 +23,6 @@ using namespace std;
 Shell Shell::instance;
 
 
-char *myconvert(const std::string &s)
-{
-    char *pc = new char[s.size() + 1];
-    strcpy(pc, s.c_str());
-    return pc;
-}
-
-
-char* compl_cmd_generator(const char *text, int state)
-{
-    std::vector<char*> cmds;
-    std::vector<std::string> temp;
-    std::vector<char*> builtincmds;
-
-
-	DIR *dp;
-        struct dirent *dirp;
-        char *path = strdup(getenv("PATH"));
-        char *dir = strtok(path, ":");
-
-        while (dir) {
-            if ((dp = opendir(dir)) == NULL) {
-                /* silently fail during tab completion in case of error */
-                dir = strtok(NULL, ":");
-                continue;
-            }
-            while ((dirp = readdir(dp)) != NULL) {
-		cmds.push_back(dirp->d_name);
-            }
-            closedir(dp);
-            dir = strtok(NULL, ":");
-        }
-
-	free(path);
-
-    for (auto const &x : Shell::getInstance().builtins) {
-	temp.push_back(x.first);
-	}
-	
- std::transform(temp.begin(), temp.end(), std::back_inserter(builtincmds), myconvert);
-
-
-
-cmds.insert( cmds.end(), builtincmds.begin(), builtincmds.end() );
-
-    static int list_index, len;
-    char *name;
-
-    if (!state) {
-        list_index = 0;
-        len = strlen(text);
-    }
-
-    while ((name = cmds[list_index++])) {
-        if (strncmp(name, text, len) == 0) {
-            return strdup(name);
-        }
-    }
-    return NULL; 
-}
-
-
-
-
-
-char* compl_env_generator(const char *text, int state)
-{
-
-    std::vector<char*> envs;
-    std::vector<std::string> temp;
-    std::vector<char*> localenvs;
-
-    char* p = *environ;
-    int i = 1; 
-    for (; p; i++)
-    {
-	char* t = "$";
-	char* both = (char*)malloc(strlen(p) + strlen(t) + 2);
-	strcpy(both, t);
-	strcat(both, p);
-	//snprintf(t, sizeof(t), "%s%s", "$", p);
-	
-	for (int i = 0; i < strlen(both); i++)
-	{
-	   if (both[i] == '=') both[i] = '\0';
-	}
-	envs.push_back(both);
-	p = *(environ + i);
-    }
-    
-
-    for (auto x : Shell::getInstance().localvars)
-	temp.push_back((char*)("$" + x.first).c_str());
-
- std::transform(temp.begin(), temp.end(), std::back_inserter(localenvs), myconvert);
-
-
-
-envs.insert( envs.end(), localenvs.begin(), localenvs.end() );
-
-
-    static int list_index, len;
-    char *name;
-
-    if (!state) {
-        list_index = 0;
-        len = strlen(text);
-    }
-
-    while ((name = envs[list_index++])) {
-        if (strncmp(name, text, len) == 0) {
-            return strdup(name);
-        }
-    }
-    return NULL; 
-}
-
-char** my_completion(const char *text, int start, int end)
-{
-    char **matches = NULL;
-    if (*text == '$')
-    	matches = rl_completion_matches(text, compl_env_generator);
-
-    else if (start == 0)
-        matches = rl_completion_matches(text, compl_cmd_generator);
-    return matches;
-}
-
 
 
 
@@ -161,7 +33,7 @@ Shell::Shell() {
 	//store history in tmp directory
 	read_history(("/home/history"));
   // Tell readline that we want to try tab-completion first.
-  rl_attempted_completion_function = my_completion;
+  rl_attempted_completion_function = word_completion;
 
   // Tell readline that $ should be left attached when performing completions.
   rl_special_prefixes = "$";

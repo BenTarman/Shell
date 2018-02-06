@@ -90,6 +90,7 @@ private:
 // SHELL UTILITY FUNCTIONS (shell_core.cpp)
 private:
 
+
   /**
    * Returns an appropriate prompt to use for return_value, the return value of
    * the previous command.
@@ -276,7 +277,7 @@ private:
    * @param state 0 the first time this function is called; otherwise, non-0
    * @return A single matching environment variable
    */
-   static char* env_completion_generator(const char* text, int state);
+   static char* envGenerator(const char* text, int state);
 
   /**
    * Generates commands for readline completion. This function will be called
@@ -288,15 +289,8 @@ private:
    * @param state 0 the first time this function is called; otherwise, non-0
    * @return A single matching command
    */
-  static char* command_completion_generator(const char* text, int state);
+  static char* cmdGenerator(const char* text, int state);
 
-  /**
-   * Pops the last value off the given vector and returns the result.
-   *
-   * @param matches The list of matches
-   * @return The last value in matches, or NULL if empty
-   */
-  static char* pop_match(std::vector<std::string>& matches);
 
 // EXTERNAL COMMAND EXECUTION (shell_cmd_execution.cpp)
 private:
