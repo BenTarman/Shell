@@ -43,18 +43,18 @@ char* Shell::cmdGenerator(const char *text, int state)
 
         while (dir) {
             if ((dp = opendir(dir)) == NULL) {
-                /* silently fail during tab completion in case of error */
                 dir = strtok(NULL, ":");
                 continue;
             }
             while ((dirp = readdir(dp)) != NULL) {
-		cmds.push_back(dirp->d_name);
+		cmds.push_back(strdup(dirp->d_name));
             }
             closedir(dp);
             dir = strtok(NULL, ":");
         }
 
 	free(path);
+	
 
     for (auto const &x : Shell::getInstance().builtins) 
 	temp.push_back(x.first);
