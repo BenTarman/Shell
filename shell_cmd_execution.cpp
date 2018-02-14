@@ -20,7 +20,7 @@ using namespace std;
 
 int lsh_launch(int n, struct command *cmd);
 char* convert(const std::string&);
-int spawnProc(int in, int out, struct command *cmd);
+void spawnProc(int in, int out, struct command *cmd);
 
 struct command
 {
@@ -54,6 +54,7 @@ int Shell::execute_external_command(vector<string>& tokens) {
 	temp[i++] = x;
   }
   
+  temp[i] = NULL;
   cmd[j].argv = (char**) malloc(sizeof(temp));
   memcpy(cmd[j].argv, temp, sizeof(temp));
 
@@ -69,7 +70,7 @@ char *convert(const std::string &s)
    return pc; 
 }
 
-int spawnProc(int in, int out, struct command *cmd)
+void spawnProc(int in, int out, struct command *cmd)
 {
   pid_t pid, wpid;
   int status;
@@ -88,7 +89,6 @@ char** args = &cmd->argv[0];
     dup2(out, 1);
     close(out);
     }
-   /* 
     char output[40];
     char input[40];
     int outFile = 0, inFile = 0, appFile = 0;
@@ -122,10 +122,9 @@ char** args = &cmd->argv[0];
    else if (appFile)
 	FILE* catStream = freopen(output, "a", stdout);
 
-*/
     if (execvp(cmd->argv[0], (char* const*) cmd->argv) != 0) {
        perror("lsh");
-	return 1;
+	return;
      }
 
      perror("exec");
@@ -134,7 +133,7 @@ char** args = &cmd->argv[0];
   else if (pid < 0)
   {
      perror("lsh");
-     return 1;
+     return;
    }
   else 
   {
@@ -143,7 +142,6 @@ char** args = &cmd->argv[0];
 	} while (!WIFEXITED(status) && !WIFSIGNALED(status));
    }
 
-  return status;
 
 }
 
@@ -151,9 +149,21 @@ int lsh_launch(int n, struct command *cmd)
 {
   int i;
 
+ 
+
+  
+  int status;
+  pid_t wpid;
+ 
   pid_t pid;
   int in, fd[2];
   in = 0;
+
+
+  pid = fork();
+  
+  if (pid == 0)
+{
   for (i = 0; i < n - 1; i++)
   {
     pipe (fd); 
@@ -162,20 +172,48 @@ int lsh_launch(int n, struct command *cmd)
     in = fd[0];
   }
 
+
+
+
+
+  char** args = &cmd[i].argv[0];
+  
   if (in != 0)
     dup2 (in, 0);
-  
-  int status;
-  pid_t wpid;
+ 
+    char output[40];
+    char input[40];
+    int outFile = 0, inFile = 0, appFile = 0;
+    
+    for (int i = 0; args[i] != NULL; i++)
+    {
+	if (strcmp(args[i], ">") == 0)
+	{
+	  args[i] = NULL;
+	  strcpy(output, args[i+1]);
+	  outFile = 1;
+	}
+	else if (strcmp(args[i], "<") == 0)
+	{
+	  args[i] = NULL;
+	  strcpy(input, args[i+1]);
+	  inFile = 1;
+	}
+	else if (strcmp(args[i], ">>") == 0)
+	{
+	  args[i] = NULL;
+	  strcpy(output, args[i+1]);
+	  appFile = 1;
+	}
+    }
 
-  //this wasn't null terminated before
-  char** args = &cmd[i].argv[0];
-  args[n] = NULL;
+   if (outFile)
+	FILE* catStream = freopen(output, "w", stdout);
+   else if (inFile)
+	FILE* catStream = freopen(input, "r", stdin);
+   else if (appFile)
+	FILE* catStream = freopen(output, "a", stdout);
 
-  pid = fork();
-  
-  if (pid == 0)
-  {
     if (execvp(args[0], args) != 0) 
     {
 	perror("lsh");
@@ -183,7 +221,9 @@ int lsh_launch(int n, struct command *cmd)
     }
     perror("exec");
     exit(127);
+
   }
+
   else if (pid < 0)
   {
     perror("lsh");
@@ -196,6 +236,8 @@ int lsh_launch(int n, struct command *cmd)
 	} while(!WIFEXITED(status) && !WIFSIGNALED(status));
   }	
   return status;
+
+
 
   
 }
