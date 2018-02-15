@@ -307,6 +307,17 @@ private:
    */
   int execute_external_command(std::vector<std::string>& argv);
 
+  struct command {
+	char **argv;
+   };
+
+  int makesSense(std::vector<std::string>&);
+
+  //launch process and spawn additional processes for pipes
+  int lsh_launch(int n, struct command *cmd);
+  int spawnProc(int n, int out, struct command *cmd);
+  static char* convert(const std::string&);
+
 // CONSTANTS AND MEMBERS (shell_core.cpp)
 private:
 

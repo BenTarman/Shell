@@ -20,17 +20,10 @@
 using namespace std;
 
 
-int lsh_launch(int n, struct command *cmd);
-char* convert(const std::string&);
-int spawnProc(int in, int out, struct command *cmd);
 
-struct command
+int Shell::makesSense(vector<string>& tokens)
 {
-  char **argv;
-};
 
-int makesSense(vector<string>& tokens)
-{
 
    std::vector<string> order;
 
@@ -63,11 +56,6 @@ int makesSense(vector<string>& tokens)
 
 
   return 0;
-  
-
-
-
-
 }
 
 
@@ -119,14 +107,14 @@ int Shell::execute_external_command(vector<string>& tokens) {
   return ret;
 }
 
-char *convert(const std::string &s)
+char* Shell::convert(const std::string &s)
 {
    char *pc = new char[s.size()+1];
    strcpy(pc, s.c_str());
    return pc; 
 }
 
-int spawnProc(int in, int out, struct command *cmd)
+int Shell::spawnProc(int in, int out, struct command *cmd)
 {
   pid_t pid, wpid;
   int status;
@@ -175,12 +163,12 @@ int spawnProc(int in, int out, struct command *cmd)
 
    if (outFile)
     {
-    if (stat(output, &res) < 0) return 1;
+    if (stat(output, &res) < 0) exit(EXIT_FAILURE);
     mode_t bits = res.st_mode;
 
     //check if we have write permissions
     if ((bits & S_IWUSR) == 0)
-	return 1; 	
+	exit(EXIT_FAILURE);
 
 	FILE* catStream = freopen(output, "w", stdout);
 
@@ -192,7 +180,7 @@ int spawnProc(int in, int out, struct command *cmd)
 
     if (execvp(cmd->argv[0], (char* const*) cmd->argv) != 0) {
        perror("lsh");
-	return 1;
+	exit(EXIT_FAILURE);
      }
 
      perror("exec");
@@ -201,7 +189,7 @@ int spawnProc(int in, int out, struct command *cmd)
   else if (pid < 0)
   {
      perror("lsh");
-     return 1;
+	exit(EXIT_FAILURE);
    }
   else 
   {
@@ -214,13 +202,9 @@ int spawnProc(int in, int out, struct command *cmd)
 
 }
 
-int lsh_launch(int n, struct command *cmd)
+int Shell::lsh_launch(int n, struct command *cmd)
 {
   int i;
-
- 
-
-  
   int status;
   pid_t wpid;
  
@@ -237,30 +221,24 @@ int lsh_launch(int n, struct command *cmd)
   {
     pipe (fd); 
     if (spawnProc(in, fd[1], cmd + i) == 1)
-	return 1;
+	exit(EXIT_FAILURE);
     close (fd[1]);
     in = fd[0];
   }
 
-
-
-
-
   char** args = &cmd[i].argv[0];
   
-  if (in != 0)
-    dup2 (in, 0);
+    if (in != 0)
+      dup2 (in, 0);
  
     char output[40];
     char input[40];
     int outFile = 0, inFile = 0, appFile = 0;
    
-    int numOuts = 0; 
     for (int i = 0; args[i] != NULL; i++)
     {
 	if (strcmp(args[i], ">") == 0)
 	{
-	  numOuts++;
 	  args[i] = NULL;
 	  strcpy(output, args[i+1]);
 	  outFile = 1;
@@ -279,10 +257,6 @@ int lsh_launch(int n, struct command *cmd)
 	}
     }
 
-   if (numOuts > 1) 
-   { 
-	exit(127);
-   }
 
    struct stat res;
    if (outFile)
@@ -303,7 +277,6 @@ int lsh_launch(int n, struct command *cmd)
 	  {
 		perror("file no exist");
 		exit(EXIT_FAILURE);
-
 	  }
 
     FILE* catStream = freopen(input, "r", stdin);
@@ -315,7 +288,7 @@ int lsh_launch(int n, struct command *cmd)
     if (execvp(args[0], args) != 0) 
     {
 	perror("lsh");
-	return 1;
+	exit(EXIT_FAILURE);
     }
     perror("exec");
     exit(127);
@@ -325,7 +298,7 @@ int lsh_launch(int n, struct command *cmd)
   else if (pid < 0)
   {
     perror("lsh");
-    return 1;
+    exit(EXIT_FAILURE);
   }
   else
   {
