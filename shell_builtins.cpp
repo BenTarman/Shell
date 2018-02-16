@@ -7,6 +7,7 @@
 #include <iostream>
 #include <dirent.h>
 #include <readline/history.h>
+#include <string.h>
 
 #define BUFF_SIZE 1024
 using namespace std;
@@ -67,7 +68,8 @@ return ret;
 
 
 int Shell::com_pwd(vector<string>& argv) {
-  if (argv.size() > 1)
+  
+	if (argv.size() > 1)
   {
 	fprintf(stderr, ": too many arguments\n");
 	return 1;
@@ -80,7 +82,6 @@ int Shell::com_pwd(vector<string>& argv) {
       printf ("Error getting pwd: %s\n", currDir);
       return 1;
     }
-
 
 
   return 0;
@@ -187,11 +188,17 @@ int Shell::com_history(vector<string>& argv) {
 	for (int i = 1; *histlst; i++, histlst++) 
             printf("%4d %s\n", i, (*histlst)->line);
 
+
+	
+
+
 	return 0;
 }
 
 
 int Shell::com_exit(vector<string>& argv) {
+  //save history for session
+	write_history(NULL);
   exit(0); 
   return 0;
 }

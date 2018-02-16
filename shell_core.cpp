@@ -15,7 +15,9 @@
 #include <dirent.h>
 #include <algorithm>
 #include <numeric>
+#include <unistd.h>
 
+#define BUFF_SIZE 1024
 using namespace std;
 
 
@@ -31,7 +33,7 @@ Shell::Shell() {
   // Tell readline that we want its help managing history.
   using_history();
 	//store history in tmp directory
-	read_history(("/home/history"));
+  read_history(NULL);
   // Tell readline that we want to try tab-completion first.
   rl_attempted_completion_function = word_completion;
 
@@ -73,7 +75,6 @@ int Shell::loop_and_handle_input() {
     // If the command is non-empty, attempt to execute it.
     if (line[0]) {
       return_value = execute_line(line);
-			write_history("/home/bentarman/cplusplus/project-1-BenTarman/history");	
     }
 
     // Free the memory for the input string.
@@ -88,6 +89,8 @@ string Shell::get_prompt(int return_value) {
     std::string username; 
 	username = getenv("USER");	
 
+
+			
 	if (return_value == 0)
 	  username += " :D ";
 	else
