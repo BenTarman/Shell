@@ -182,7 +182,6 @@ int Shell::com_echo(vector<string>& argv) {
 int Shell::com_history(vector<string>& argv) {
 
 	if (argv.size() > 1) return 1;
-	HISTORY_STATE* hist_state = history_get_history_state(); 
 	HIST_ENTRY** histlst = history_list();
 	printf("history\n");
 	for (int i = 1; *histlst; i++, histlst++) 

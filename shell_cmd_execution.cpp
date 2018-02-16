@@ -118,7 +118,7 @@ int Shell::spawnProc(int in, int out, struct command *cmd)
     }
 
 		struct stat res;
-
+		FILE* catStream;
 		if (outFile)
     {
 			if (stat(output, &res) < 0) exit(EXIT_FAILURE);
@@ -128,7 +128,7 @@ int Shell::spawnProc(int in, int out, struct command *cmd)
 			if ((bits & S_IWUSR) == 0)
 				exit(EXIT_FAILURE);
 
-			FILE* catStream = freopen(output, "w", stdout);
+			catStream = freopen(output, "w", stdout);
 
      }
 		else if (inFile)
@@ -145,7 +145,7 @@ int Shell::spawnProc(int in, int out, struct command *cmd)
 			//check if we have write permissions
 			if ((bits & S_IRUSR) == 0)
 				exit(EXIT_FAILURE);
-			FILE* catStream = freopen(input, "r", stdin);
+			 catStream = freopen(input, "r", stdin);
 		}
 		else if (appFile) 
 		{
@@ -155,7 +155,7 @@ int Shell::spawnProc(int in, int out, struct command *cmd)
 			//check if we have write permissions
 			if ((bits & S_IWUSR) == 0)
 				exit(EXIT_FAILURE);
-			FILE* catStream = freopen(output, "a", stdout);
+			 catStream = freopen(output, "a", stdout);
 		}
 
 		if (execvp(cmd->argv[0], (char* const*) cmd->argv) != 0) 
@@ -246,7 +246,7 @@ int Shell::lsh_launch(int n, struct command *cmd)
 
 
    struct stat res;
-   
+   FILE* catStream;
 		if (outFile)
 		{
 			if (stat(output, &res) < 0) return 1;
@@ -254,7 +254,7 @@ int Shell::lsh_launch(int n, struct command *cmd)
 
 			//check if we have write permissions
 			if ((bits & S_IWUSR) == 0) return 1; 	
-			FILE* catStream = freopen(output, "w", stdout);
+			 catStream = freopen(output, "w", stdout);
 		}
 		else if (inFile)
 		{
@@ -270,7 +270,7 @@ int Shell::lsh_launch(int n, struct command *cmd)
 			//check if we have write permissions
 			if ((bits & S_IRUSR) == 0) return 1; 	
 
-		FILE* catStream = freopen(input, "r", stdin);
+		 catStream = freopen(input, "r", stdin);
 		}
 		else if (appFile)
 		{
@@ -280,7 +280,7 @@ int Shell::lsh_launch(int n, struct command *cmd)
 			//check if we have write permissions
 			if ((bits & S_IWUSR) == 0) return 1; 
 	
-			FILE* catStream = freopen(output, "a", stdout);
+			catStream = freopen(output, "a", stdout);
 		}
 
     if (execvp(args[0], args) != 0) 
